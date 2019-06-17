@@ -23,7 +23,7 @@ public class LdapService {
 
     public Boolean connect() {
 
-        String ldapHost = "192.168.99.101";
+        String ldapHost = "54.147.135.22";
         String dn = "cn=admin,dc=laundry,dc=unal,dc=edu,dc=co";
         String password = "admin";
 
@@ -49,6 +49,7 @@ public class LdapService {
             lc.bind(dn, password);
             return true;
         } catch (LDAPException ex) {
+            ex.printStackTrace();
             return false;
         }
     }
@@ -85,6 +86,7 @@ public class LdapService {
 
             return a;
         } catch (LDAPException ex){
+            ex.printStackTrace();
             return "LDAPException found";
         }
     }
