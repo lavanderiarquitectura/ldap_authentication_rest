@@ -1,5 +1,6 @@
 package sa.student.resource;
 
+import com.google.gson.Gson;
 import sa.student.model.User;
 import sa.student.service.AuthService;
 
@@ -35,9 +36,26 @@ public class AuthResource {
         student.setPassword(n2);
 
         String reponse = authService.login(student);
-        response = Response.status(Response.Status.OK);
-        response.entity(reponse);
-        return response.build();
+
+        System.out.println(response);
+
+        String[] userArray = reponse.split(";");
+
+        if(userArray.length > 1){
+            student.setName(userArray[1]);
+            student.setLast_name(userArray[2]);
+            student.setPersonal_id(Integer.parseInt(userArray[3]));
+            student.setRoom_id(Integer.parseInt(userArray[4]));
+        } else{
+            student.setPersonal_id(-1);
+        }
+
+        Gson gson = new Gson();
+        return Response.ok(gson.toJson(student)).build();
+
+//        response = Response.status(Response.Status.OK);
+//        response.entity(reponse);
+//        return student;
     }
 
 }

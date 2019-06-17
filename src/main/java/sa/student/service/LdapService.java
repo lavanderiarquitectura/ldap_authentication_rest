@@ -62,9 +62,27 @@ public class LdapService {
         String a  = "";
         try{
             foundEntry = lc.read(dn, getAttrs);
+
+            uid = foundEntry.getAttribute("uid");
+            values = uid.getStringValueArray();
+            a = a + values[0] + ";";
+
+            uid = foundEntry.getAttribute("givenName");
+            values = uid.getStringValueArray();
+            a = a + values[0] + ";";
+
+            uid = foundEntry.getAttribute("sn");
+            values = uid.getStringValueArray();
+            a = a + values[0] + ";";
+
             uid = foundEntry.getAttribute("uidNumber");
             values = uid.getStringValueArray();
-            a = values[0];
+            a = a + values[0] + ";";
+
+            uid = foundEntry.getAttribute("departmentNumber");
+            values = uid.getStringValueArray();
+            a = a + values[0] + ";";
+
             return a;
         } catch (LDAPException ex){
             return "LDAPException found";
