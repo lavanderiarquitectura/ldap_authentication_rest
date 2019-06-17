@@ -24,7 +24,7 @@ public class AuthResource {
     @EJB
     AuthService authService = new AuthService();
 
-    @POST
+    @GET
     @Consumes(MediaType.TEXT_PLAIN)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{usr}/{psw}")
