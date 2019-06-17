@@ -51,7 +51,14 @@ public class AuthResource {
         }
 
         Gson gson = new Gson();
-        return Response.ok(gson.toJson(student)).build();
+        return Response.ok(gson.toJson(student))
+                .status(200)
+                .header("Access-Control-Allow-Origin", "*")
+                .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
+                .header("Access-Control-Allow-Credentials", "true")
+                .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD")
+                .header("Access-Control-Max-Age", "1209600")
+                .build();
 
 //        response = Response.status(Response.Status.OK);
 //        response.entity(reponse);
