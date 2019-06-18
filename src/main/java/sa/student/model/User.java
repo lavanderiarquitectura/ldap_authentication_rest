@@ -16,10 +16,6 @@ public class User implements Serializable{
 
 	private Integer room_id;
 
-	private boolean is_active;
-
-	private boolean was_last_user;
-
 	private String username;
 
 
@@ -72,13 +68,6 @@ public class User implements Serializable{
 		this.room_id = room_id;
 	}
 
-	public boolean getIs_active() {
-		return is_active;
-	}
-
-	public void setIs_active(boolean is_active) {
-		this.is_active = is_active;
-	}
 
 	public String getUsername() {
 		return username;
@@ -88,12 +77,5 @@ public class User implements Serializable{
 		this.username = username;
 	}
 
-	public boolean getWas_last_user() {
-		return was_last_user;
-	}
-
-	public void setWas_last_user(boolean was_last_user) {
-		this.was_last_user = was_last_user;
-	}
 
 }
