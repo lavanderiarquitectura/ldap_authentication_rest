@@ -1,7 +1,6 @@
 package sa.student;
 
 import sa.student.resource.AuthResource;
-import sa.student.service.AuthService;
 
 import java.util.HashSet;
 import java.util.Set;

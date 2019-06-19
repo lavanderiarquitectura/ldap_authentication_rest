@@ -4,8 +4,6 @@ import java.io.Serializable;
 
 public class User implements Serializable{
 
-	private Long id;
-
 	private String name;
 
 	private String last_name;
@@ -19,14 +17,20 @@ public class User implements Serializable{
 	private String username;
 
 
-
-	public Long getId() {
-		return id;
+	public User (){
+		super();
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+	public User(String name, String last_name, Integer personalId, String password, Integer room_id, String username) {
+		super();
+		this.name = name;
+		this.last_name = last_name;
+		this.personalId = personalId;
+		this.password = password;
+		this.room_id = room_id;
+		this.username = username;
 	}
+
 
 	public String getName() {
 		return name;

@@ -11,6 +11,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
+import javax.xml.bind.annotation.XmlAttachmentRef;
 
 
 @Path("/auth")
@@ -28,11 +29,10 @@ public class AuthResource {
     @Consumes(MediaType.TEXT_PLAIN)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{usr}/{psw}")
-
     public Response login(@PathParam("usr") String n1, @PathParam("psw") String n2){
         User student = new User();
 
-        student.setUsername(n1);
+        student.setPersonal_id(Integer.parseInt(n1));
         student.setPassword(n2);
 
         String reponse = authService.login(student);
@@ -63,6 +63,43 @@ public class AuthResource {
 //        response = Response.status(Response.Status.OK);
 //        response.entity(reponse);
 //        return student;
+    }
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Path("/register")
+    public Response register( String user){
+        String reponse = "";
+        try {
+            Gson gson = new Gson();
+            User student = gson.fromJson(user, User.class);
+
+            System.out.println(user);
+
+            reponse = authService.register(student);
+
+        }catch (Exception e){
+            e.printStackTrace();
+            return Response.noContent()
+                    .status(415)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
+                    .header("Access-Control-Allow-Credentials", "true")
+                    .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD")
+                    .header("Access-Control-Max-Age", "1209600")
+                    .build();
+        }
+
+        return Response.ok(reponse)
+                .status(200)
+                .header("Access-Control-Allow-Origin", "*")
+                .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
+                .header("Access-Control-Allow-Credentials", "true")
+                .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD")
+                .header("Access-Control-Max-Age", "1209600")
+                .build();
+
     }
 
 }
