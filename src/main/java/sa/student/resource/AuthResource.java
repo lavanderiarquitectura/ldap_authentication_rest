@@ -1,6 +1,8 @@
 package sa.student.resource;
 
 import com.google.gson.Gson;
+import org.json.JSONObject;
+import sa.student.model.Token;
 import sa.student.model.User;
 import sa.student.service.AuthService;
 
@@ -12,6 +14,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.annotation.XmlAttachmentRef;
+import java.util.ArrayList;
 
 
 @Path("/auth")
@@ -50,7 +53,11 @@ public class AuthResource {
         student.setPersonal_id(Integer.parseInt(n1));
         student.setPassword(n2);
 
-	    JSONObject response = new JSONObject();
+	    //JSONObject response = new JSONObject();
+        String response = "";
+
+        Gson gson = new Gson();
+
         int responseStatus;
         String[] userArray = authService.login(student).split(";");
 
@@ -59,10 +66,14 @@ public class AuthResource {
 	    	long dayInMillis = 1000 * 60 * 60 * 24;
         	Token token = new Token(id, generateTokenString(),  System.currentTimeMillis() + dayInMillis);
 	    	tokens.add(token);
-	    	response.put("login", token.getToken());
+
+	    	response = "{\"login\" : \""+ token.getToken() +"\"}";
+
+	    	//response.put("login", token.getToken());
             responseStatus = 200;
         } else{
-        	response.put("login", "failure");
+        	//response.put("login", "failure");
+            response = "{\"login\" : \"failure\"}";
             responseStatus = 403;
         }
 
@@ -83,20 +94,24 @@ public class AuthResource {
 
     public Response loginOperator(@PathParam("usr") String username, @PathParam("psw") String password){
  
-	    JSONObject response = new JSONObject();
+	    //JSONObject response = new JSONObject();
         int responseStatus;
+        String response = "";
  
-	    if(user.equals("admin") && password.equals("admin123")) {
+	    if(username.equals("admin") && password.equals("admin123")) {
 	    	long dayInMillis = 1000 * 60 * 60 * 24;
 	    	Token token = new Token(0, generateTokenString(), System.currentTimeMillis() + dayInMillis);
 	    	tokens.add(token);
-	    	response.put("login", token.getToken());
+	    	//response.put("login", token.getToken());
+            response = "{\"login\" : \""+ token.getToken() +"\"}";
 	    	responseStatus = 200;
 	    }
 	    else {
-	    	response.put("login", "failure");
+            // response.put("login", "failure");
+            response = "{\"login\" : \"failure\"}";
 	    	responseStatus = 403;
 	    }
+        Gson gson = new Gson();
         return Response.ok(response)
                 .status(responseStatus)
                 .header("Access-Control-Allow-Origin", "*")
@@ -114,24 +129,29 @@ public class AuthResource {
     @Path("/token/{token}")
 
     public Response validateToken(@PathParam("token") String token){
-	    JSONObject response = new JSONObject();
+	    //JSONObject response = new JSONObject();
+        String response = "";
         int responseStatus = 403;
        
 		for(Token t : tokens) {
 			if(t.getToken().equals(token)) {
 				System.out.println("Token found!");
 				if(t.getExpiration() >= System.currentTimeMillis()) {
-					response.put("user", t.getUserId());
+					//response.put("user", t.getUserId());
+                    response = "{\"user\" : \""+ t.getUserId() +"\"}";
 					responseStatus = 200;
 				}
 				//Token expired
 				else {
 					tokens.remove(t);
-					response.put("user", -1);
+					//response.put("user", -1);
+                    response = "{\"user\" : -1}";
 					break;
 				}
 			}
 		}
+
+		Gson gson = new Gson();
 
         return Response.ok(response)
                 .status(responseStatus)

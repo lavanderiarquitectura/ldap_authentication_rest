@@ -45,5 +45,6 @@
     <orderEntry type="library" name="Maven: org.glassfish.jersey.core:jersey-server:sources:2.13" level="project" />
     <orderEntry type="library" name="Maven: org.glassfish.jersey.containers:jersey-container-servlet-core:sources:2.13" level="project" />
     <orderEntry type="library" name="Maven: org.glassfish.jersey.containers:jersey-container-servlet:sources:2.13" level="project" />
+    <orderEntry type="library" name="Maven: org.json:json:20180813" level="project" />
   </component>
 </module>
