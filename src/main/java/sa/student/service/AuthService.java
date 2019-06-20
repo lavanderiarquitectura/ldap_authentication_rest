@@ -31,6 +31,15 @@ public class AuthService {
         }
         return response;
     }
+	
+	    
+    public String getUser(String username) {
+        if (ldapService.connect()) {
+                return ldapService.getData(username);
+        } else {
+            return "false";
+        }
+    }
 
     public String register(User student) {
 
