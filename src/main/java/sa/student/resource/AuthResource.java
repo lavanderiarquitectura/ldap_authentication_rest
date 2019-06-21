@@ -50,7 +50,7 @@ public class AuthResource {
     public Response login(@PathParam("usr") String n1, @PathParam("psw") String n2){
         User student = new User();
 
-        student.setPersonal_id(Integer.parseInt(n1));
+        student.setPersonal_id(Long.parseLong(n1));
         student.setPassword(n2);
 
 	    //JSONObject response = new JSONObject();
@@ -183,11 +183,11 @@ public class AuthResource {
         if(userArray.length > 1){
             student.setName(userArray[1]);
             student.setLast_name(userArray[2]);
-            student.setPersonal_id(Integer.parseInt(userArray[3]));
+            student.setPersonal_id(Long.parseLong(userArray[3]));
             student.setRoom_id(Integer.parseInt(userArray[4]));
             responseStatus = 200;
         } else{
-            student.setPersonal_id(-1);
+            student.setPersonal_id((long) -1);
             responseStatus = 403;
         }
 

@@ -8,7 +8,7 @@ public class User implements Serializable{
 
 	private String last_name;
 
-	private Integer personalId;
+	private Long personalId;
 
 	private String password;
 
@@ -21,7 +21,7 @@ public class User implements Serializable{
 		super();
 	}
 
-	public User(String name, String last_name, Integer personalId, String password, Integer room_id, String username) {
+	public User(String name, String last_name, Long personalId, String password, Integer room_id, String username) {
 		super();
 		this.name = name;
 		this.last_name = last_name;
@@ -48,11 +48,11 @@ public class User implements Serializable{
 		this.last_name = last_name;
 	}
 
-	public Integer getPersonal_id() {
+	public Long getPersonal_id() {
 		return personalId;
 	}
 
-	public void setPersonal_id(Integer personal_id) {
+	public void setPersonal_id(Long personal_id) {
 		this.personalId = personal_id;
 	}
 
