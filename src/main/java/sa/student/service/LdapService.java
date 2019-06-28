@@ -11,7 +11,7 @@ public class LdapService {
 
     public Boolean login(String user, String password){
         if (connect()) {
-            if (validateUser(user, password)) {
+            if (validateUser(user, password, "user")) {
                 return true;
             } else {
                 return false;
@@ -43,14 +43,19 @@ public class LdapService {
         }
     }
 
-    public Boolean validateUser(String username, String password){
+    public Boolean validateUser(String username, String password, String type){
 
         String dn = "cn=" + username + ",ou=laundry,dc=laundry,dc=unal,dc=edu,dc=co";
+
+        String dnOperator = "cn=" + username + ",ou=laundryOperator,dc=laundry,dc=unal,dc=edu,dc=co";
 
         System.out.println("cn a conectar:" + dn);
 
         try {
-            lc.bind(dn, password);
+            if(type.equalsIgnoreCase("operator"))
+                lc.bind(dnOperator , password);
+            else
+                lc.bind(dn, password);
             return true;
         } catch (LDAPException ex) {
             ex.printStackTrace();
@@ -81,15 +86,42 @@ public class LdapService {
         }
     }
 
-    public String getData(String username){
+    public Boolean insertOperator(String firstName, String lastName, String personalId, String pass, String room, String username){
+
+        String dn = "cn=" + personalId + ",ou=laundryOperator,dc=laundry,dc=unal,dc=edu,dc=co";
+
+        LDAPAttributeSet attribs = new LDAPAttributeSet();
+        attribs.add(new LDAPAttribute("cn",username));
+        attribs.add(new LDAPAttribute("givenName",firstName));
+        attribs.add(new LDAPAttribute("sn",lastName));
+        attribs.add(new LDAPAttribute("uid",personalId));
+        attribs.add(new LDAPAttribute("userPassword",pass));
+        attribs.add(new LDAPAttribute("departmentNumber",room));
+        attribs.add(new LDAPAttribute("objectClass","inetOrgPerson"));
+
+        try {
+            LDAPEntry entry = new LDAPEntry(dn,attribs);
+            lc.add(entry);
+            return true;
+        } catch (LDAPException ex) {
+            ex.printStackTrace();
+            return false;
+        }
+    }
+
+    public String getData(String username, String type){
         String dn = "cn=" + username + ",ou=laundry,dc=laundry,dc=unal,dc=edu,dc=co";
+        String dnOperator = "cn=" + username + ",ou=laundryOperator,dc=laundry,dc=unal,dc=edu,dc=co";
         LDAPEntry foundEntry = null;
         LDAPAttribute uid = null;
         String getAttrs[] = {"uid", "givenName", "sn", "uidNumber", "departmentNumber"};
         String values[] = {};
         String a  = "";
         try{
-            foundEntry = lc.read(dn, getAttrs);
+            if(type.equalsIgnoreCase("operator"))
+                foundEntry = lc.read(dnOperator, getAttrs);
+            else
+                foundEntry = lc.read(dn, getAttrs);
 
             uid = foundEntry.getAttribute("uid");
             values = uid.getStringValueArray();

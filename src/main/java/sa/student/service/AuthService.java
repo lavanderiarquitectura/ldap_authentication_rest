@@ -21,8 +21,8 @@ public class AuthService {
         String password = student.getPassword();
 
         if (ldapService.connect()) {
-            if (ldapService.validateUser(personalID, password)) {
-                response = ldapService.getData(personalID);
+            if (ldapService.validateUser(personalID, password, "user")) {
+                response = ldapService.getData(personalID, "user");
             } else {
                 response = "false";
             }
@@ -31,27 +31,48 @@ public class AuthService {
         }
         return response;
     }
-	
-	    
+
+    public String loginOperator(User operator) {
+
+        String username = operator.getUsername();
+        String password = operator.getPassword();
+
+        if (ldapService.connect()) {
+            if (ldapService.validateUser(username, password, "operator")) {
+                response = ldapService.getData(username, "operator");
+            } else {
+                response = "false";
+            }
+        } else {
+            response = "false";
+        }
+        return response;
+    }
+
     public String getUser(String username) {
         if (ldapService.connect()) {
-                return ldapService.getData(username);
+                return ldapService.getData(username, "user");
         } else {
             return "false";
         }
     }
 
-    public String register(User student) {
+    public String register(User entry, String type) {
 
-        String personalID = student.getPersonal_id().toString();
-        String password = student.getPassword();
-        String firstName = student.getName();
-        String lastName = student.getLast_name();
-        String room = student.getRoom_id().toString();
+        String personalID = entry.getPersonal_id().toString();
+        String password = entry.getPassword();
+        String firstName = entry.getName();
+        String lastName = entry.getLast_name();
+        String room = entry.getRoom_id().toString();
+        String username = entry.getUsername();
 
+        boolean success;
         if (ldapService.connect()) {
 
-            boolean success = ldapService.insertUser(firstName, lastName, personalID, password, room);
+            if(type.equalsIgnoreCase("operator"))
+                success = ldapService.insertOperator(firstName, lastName, personalID, password, room, username);
+            else
+                success = ldapService.insertUser(firstName, lastName, personalID, password, room);
 
             if (success) {
                 response = "user created";
