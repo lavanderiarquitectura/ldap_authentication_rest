@@ -1,5 +1,6 @@
 package sa.student.service;
 
+import com.novell.ldap.LDAPException;
 import sa.student.model.User;
 
 import javax.ejb.Stateless;
@@ -20,7 +21,7 @@ public class AuthService {
         String personalID = student.getPersonal_id().toString();
         String password = student.getPassword();
 
-        if (ldapService.connect()) {
+        if (ldapService.connector.isConnected()) {
             if (ldapService.validateUser(personalID, password, "user")) {
                 response = ldapService.getData(personalID, "user");
             } else {
@@ -29,6 +30,13 @@ public class AuthService {
         } else {
             response = "false";
         }
+
+//        try {
+//            ldapService.getLc().disconnect();
+//        } catch (LDAPException e) {
+//            e.printStackTrace();
+//        }
+
         return response;
     }
 
@@ -37,7 +45,7 @@ public class AuthService {
         String username = operator.getUsername();
         String password = operator.getPassword();
 
-        if (ldapService.connect()) {
+        if (ldapService.connector.isConnected()) {
             if (ldapService.validateUser(username, password, "operator")) {
                 response = ldapService.getData(username, "operator");
             } else {
@@ -50,7 +58,7 @@ public class AuthService {
     }
 
     public String getUser(String username) {
-        if (ldapService.connect()) {
+        if (ldapService.connector.isConnected()) {
                 return ldapService.getData(username, "user");
         } else {
             return "false";
@@ -67,21 +75,27 @@ public class AuthService {
         String username = entry.getUsername();
 
         boolean success;
-        if (ldapService.connect()) {
+        if (ldapService.connector.isConnected()) {
 
-            if(type.equalsIgnoreCase("operator"))
-                success = ldapService.insertOperator(firstName, lastName, personalID, password, room, username);
-            else
-                success = ldapService.insertUser(firstName, lastName, personalID, password, room);
+            if(getUser(personalID).equalsIgnoreCase("LDAPException found")){
+                if(type.equalsIgnoreCase("operator"))
+                    success = ldapService.insertOperator(firstName, lastName, personalID, password, room, username);
+                else
+                    success = ldapService.insertUser(firstName, lastName, personalID, password, room);
 
-            if (success) {
-                response = "user created";
+                if (success) {
+                    response = "user created";
+                } else {
+                    response = "false";
+                }
             } else {
-                response = "false";
+                response = "user already exist!";
             }
+
         } else {
             response = "false";
         }
+
         return response;
     }
 }

@@ -5,12 +5,20 @@ import javax.faces.context.FacesContext;
 import java.io.UnsupportedEncodingException;
 
 public class LdapService {
+    public LdapConnector connector = LdapConnector.getInstance();
 
-    private LDAPConnection lc = new LDAPConnection();
-
+//    private LDAPConnection lc = new LDAPConnection();
+//
+//    public LDAPConnection getLc() {
+//        return lc;
+//    }
+//
+//    public void setLc(LDAPConnection lc) {
+//        this.lc = lc;
+//    }
 
     public Boolean login(String user, String password){
-        if (connect()) {
+        if (connector.isConnected()) {
             if (validateUser(user, password, "user")) {
                 return true;
             } else {
@@ -21,27 +29,42 @@ public class LdapService {
         }
     }
 
-    public Boolean connect() {
-
-        String ldapHost = "54.166.103.169";
-        //String ldapHost = "192.168.99.101";
-        String dn = "cn=admin,dc=laundry,dc=unal,dc=edu,dc=co";
-        String password = "admin";
-
-        int ldapPort =  LDAPConnection.DEFAULT_PORT;
-        int ldapVersion = LDAPConnection.LDAP_V3;
-
-        try {
-            lc.connect(ldapHost, ldapPort);
-            System.out.println("Connecting to LDAP Server...");
-            lc.bind(ldapVersion, dn, password.getBytes("UTF8"));
-            System.out.println("Authenticated in LDAP Server...");
-            return true;
-        } catch (LDAPException | UnsupportedEncodingException ex) {
-            System.out.println("ERROR when connecting to LDAP Server...");
-            return false;
-        }
-    }
+//    public Boolean connect() {
+//
+//        String ldapHost = "54.166.103.169";
+//        //String ldapHost = "192.168.99.101";
+//        String dn = "cn=admin,dc=laundry,dc=unal,dc=edu,dc=co";
+//        String password = "admin";
+//
+//        int ldapPort =  LDAPConnection.DEFAULT_PORT;
+//        int ldapVersion = LDAPConnection.LDAP_V3;
+//
+//        try {
+//            lc.connect(ldapHost, ldapPort);
+//            System.out.println("Connecting to LDAP Server...");
+//
+//            LDAPResponseQueue queue = lc.bind(ldapVersion, dn, password.getBytes("UTF8"), (LDAPResponseQueue) null);
+//            LDAPMessage message;
+//
+//            while(( message = queue.getResponse()) != null){
+//                System.out.println(message.getClass().getName());
+//
+//                if(((LDAPResponse) message).getResultCode() == 0){
+////                    System.out.println("Codigo de respuesta LDAPResponse: " + ((LDAPResponse) message).getResultCode());
+////                    System.out.println("operacion bind para user correcto:" + dn);
+//                    System.out.println("Authenticated in LDAP Server...");
+//                }else
+//                    return false;
+//            }
+//
+//            //lc.bind(ldapVersion, dn, password.getBytes("UTF8"));
+//            return true;
+//        } catch (LDAPException | UnsupportedEncodingException ex) {
+//            System.out.println("ERROR when connecting to LDAP Server...");
+//            ex.printStackTrace();
+//            return false;
+//        }
+//    }
 
     public Boolean validateUser(String username, String password, String type){
 
@@ -49,18 +72,50 @@ public class LdapService {
 
         String dnOperator = "cn=" + username + ",ou=laundryOperator,dc=laundry,dc=unal,dc=edu,dc=co";
 
+        Boolean bind_reponse = false;
+        long startTime = System.currentTimeMillis();
         System.out.println("cn a conectar:" + dn);
 
         try {
-            if(type.equalsIgnoreCase("operator"))
-                lc.bind(dnOperator , password);
-            else
-                lc.bind(dn, password);
-            return true;
+            if(type.equalsIgnoreCase("operator")){
+                LDAPResponseQueue queue = connector.getLc().bind(LDAPConnection.LDAP_V3, dnOperator , password.getBytes("UTF8"), (LDAPResponseQueue) null);
+                LDAPMessage message;
+
+                while(( message = queue.getResponse()) != null){
+                    System.out.println(message.getClass().getName());
+
+                    if(((LDAPResponse) message).getResultCode() == 0){
+                        bind_reponse = true;
+                        System.out.println("Codigo de respuesta LDAPResponse: " + ((LDAPResponse) message).getResultCode());
+                        System.out.println("operacion bind para operator correcto:" + dn);
+                    }
+                }
+
+            }
+            else{
+                LDAPResponseQueue queue = connector.getLc().bind(LDAPConnection.LDAP_V3, dn, password.getBytes("UTF8"), (LDAPResponseQueue) null);
+                LDAPMessage message;
+
+                while(( message = queue.getResponse()) != null){
+                    System.out.println(message.getClass().getName());
+
+                    if(((LDAPResponse) message).getResultCode() == 0){
+                        bind_reponse = true;
+                        System.out.println("Codigo de respuesta LDAPResponse: " + ((LDAPResponse) message).getResultCode());
+                        System.out.println("operacion bind para user correcto:" + dn);
+                    }
+                }
+
+                long endTime = System.currentTimeMillis();
+                System.out.println( (startTime - endTime) );
+            }
+            return bind_reponse;
         } catch (LDAPException ex) {
             ex.printStackTrace();
-            return false;
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
         }
+        return false;
     }
 
     public Boolean insertUser(String firstName, String lastName, String personalId, String pass, String room){
@@ -78,7 +133,7 @@ public class LdapService {
 
         try {
             LDAPEntry entry = new LDAPEntry("cn="+personalId+",ou=laundry,dc=laundry,dc=unal,dc=edu,dc=co",attribs);
-            lc.add(entry);
+            connector.getLc().add(entry);
             return true;
         } catch (LDAPException ex) {
             ex.printStackTrace();
@@ -101,7 +156,7 @@ public class LdapService {
 
         try {
             LDAPEntry entry = new LDAPEntry(dn,attribs);
-            lc.add(entry);
+            connector.getLc().add(entry);
             return true;
         } catch (LDAPException ex) {
             ex.printStackTrace();
@@ -119,9 +174,9 @@ public class LdapService {
         String a  = "";
         try{
             if(type.equalsIgnoreCase("operator"))
-                foundEntry = lc.read(dnOperator, getAttrs);
+                foundEntry = connector.getLc().read(dnOperator, getAttrs);
             else
-                foundEntry = lc.read(dn, getAttrs);
+                foundEntry = connector.getLc().read(dn, getAttrs);
 
             uid = foundEntry.getAttribute("uid");
             values = uid.getStringValueArray();
