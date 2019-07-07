@@ -43,7 +43,7 @@ public class LdapConnector {
 
     public Boolean connect() {
 
-        String ldapHost = "54.166.103.169";
+        String ldapHost = "52.7.78.51";
         //String ldapHost = "192.168.99.101";
         String dn = "cn=admin,dc=laundry,dc=unal,dc=edu,dc=co";
         String password = "admin";
